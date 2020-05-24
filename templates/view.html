@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="stylesheet" href="../static/table.css" type="text/css">
+    <meta charset="ISO-8859-1">
+    <title>Employee Details</title>
+</head>
+<body>
+    <h1>Employee Details</h1>
+    <form action="/home">
+        <button type="Submit" class="btnhome">Home</button>
+    </form>
+    <table border="1" cellpadding="1" cellspacing="1" class="blueTable">
+        <th>ID</th><th>Age</th><th>BusinessTravel</th><th>Department</th><th>DistanceFromHome</th><th>Education</th><th>EducationField</th><th>Gender</th><th>JobRole</th><th>JobSatisfaction</th><th>MaritalStatus</th><th>MonthlyIncome</th><th>NumCompaniesWorked</th><th>OverTime</th><th>PercentSalaryHike</th><th>YearsInCurrentRole</th><th>YearsSinceLastPromotion</th>
+        {% for row in data %}
+            <tr>
+            {% for d in row %}
+                <td>{{ d }}</td>
+            {% endfor %}
+            </tr>
+        {% endfor %}
+    </table>
+</body>
+</html>
