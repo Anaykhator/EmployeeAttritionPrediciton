@@ -92,17 +92,21 @@ def updateDet():
     db = SQL("sqlite:///dataset.db")
     if param == "":
         if job == "":
-            db.execute("UPDATE dataset SET MaritalStatus=:ms WHERE ID=:i", ms=marstat, i=int(id))
-        elif marstat == "":
-            db.execute("UPDATE dataset SET JobRole=:j WHERE ID=:i", j=job, i=int(id))
+            if marstat == "":
+                return updateMessage("Enter atleast one value to be updated")
+            else:
+                db.execute("UPDATE dataset SET MaritalStatus=:ms WHERE ID=:i", ms=marstat, i=int(id))
         else:
-            db.execute("UPDATE dataset SET  JobRole=:j, MaritalStatus=:ms WHERE ID=:i", j=job, ms=marstat, i=int(id))
+            if marstat == "":
+                db.execute("UPDATE dataset SET JobRole=:j WHERE ID=:i", j=job, i=int(id))
+            else:
+                db.execute("UPDATE dataset SET JobRole=:j, MaritalStatus=:ms WHERE ID=:i", j=job, ms=marstat, i=int(id))
     else:
         if job == "" and marstat == "":
             db.execute("UPDATE dataset SET " + param + "=:val WHERE ID=:i", val=int(paramval), i=int(id))
-        elif job == "":
+        elif job == "" and marstat != "":
             db.execute("UPDATE dataset SET " + param + "=:val, MaritalStatus=:ms WHERE ID=:i", val=int(paramval), ms=marstat, i=int(id))
-        elif marstat == "":
+        elif marstat == "" and job != "":
             db.execute("UPDATE dataset SET " + param + "=:val, JobRole=:j WHERE ID=:i", val=int(paramval), j=job, i=id)
         else:
             db.execute("UPDATE dataset SET " + param + "=:val, JobRole=:j, MaritalStatus=:ms WHERE ID=:i", val=int(paramval), j=job, ms=marstat, i=int(id))

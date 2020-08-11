@@ -3,11 +3,11 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import LabelEncoder
-from sklearn.ensemble import RandomForestClassifier
-from xgboost import XGBClassifier
-from sklearn.metrics import accuracy_score
+# from sklearn.ensemble import RandomForestClassifier
+# from xgboost import XGBClassifier
+# from sklearn.metrics import accuracy_score
 from flask import flash
-from sklearn import preprocessing
+# from sklearn import preprocessing
 import numpy as np
 import pickle
 from keras.models import load_model
