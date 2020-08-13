@@ -33,12 +33,24 @@
             </tr>
         {% endfor %}
     </table>
-{#    <div class="sugg">#}
-{#        <h2>Prevailing Factors</h2>#}
-{#        Employee ID: 1 | Monthly Income<br><br>#}
-{#        Employee ID: 3 | Percent Salary Hike<br><br>#}
-{#        Employee ID: 13 | Distance From Home<br><br>#}
-{#        Employee ID: 28 | Monthly Income<br><br>#}
-{#    </div>#}
+<!--    <div class="sugg">-->
+<!--        <h2>Prevailing Factors</h2>-->
+<!--        Employee ID: 1 | Monthly Income<br><br>-->
+<!--        Employee ID: 3 | Percent Salary Hike<br><br>-->
+<!--        Employee ID: 13 | Distance From Home<br><br>-->
+<!--        Employee ID: 28 | Monthly Income<br><br>-->
+<!--    </div>-->
+    {% block content %}
+    {% if display_eval == True %}
+    <div class="sugg">
+            <h2>Model Performance</h2>
+            Accuracy : {{ evaluations[0] }}<br><br>
+            Precision: {{ evaluations[1] }}<br><br>
+            Recall: {{ evaluations[2] }}<br><br>
+            Sensitivity: {{ evaluations[3] }}<br><br>
+            Specitivity: {{ evaluations[4] }}<br><br>
+    </div>
+    {% endif %}
+    {% endblock content %}
 </body>
 </html>

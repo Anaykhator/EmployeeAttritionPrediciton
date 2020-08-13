@@ -5,11 +5,15 @@ Created on Tue May 19 22:19:37 2020
 @author: Anay
 """
 
+import os
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
+import tensorflow as tf
 from keras.wrappers.scikit_learn import KerasClassifier
 from sklearn.model_selection import cross_validate
 from sklearn.metrics import make_scorer, accuracy_score, recall_score, f1_score
 from keras.models import load_model
 import pandas as pd
+import numpy as np
 import keras
 from keras.models import Sequential
 from keras.layers import Dense, Dropout
@@ -128,28 +132,60 @@ def heatmap():
 
 
 def build_ntwrk():
-    import keras
-    from keras.models import Sequential
-    from keras.layers import Dense, Dropout
-    from keras.metrics import Recall
-    model = Sequential()
-    model.add(Dense(units = 14, activation = 'relu', input_dim = 30))
-    model.add(Dropout(0.2995426239200045))
-    model.add(Dense(units = 18, activation = 'relu'))
-    model.add(Dropout(0.20974398051884063))
-    model.add(Dense(units = 1, activation = 'sigmoid'))
-
-    rmsprop = keras.optimizers.RMSprop(lr=10**-2)
-
-    model.compile(optimizer = rmsprop, loss = 'binary_crossentropy', metrics = ['accuracy'])
-
-    result = model.fit(x= X_train,y = y_train, batch_size = 24, epochs = 200, validation_split = 0.2)
-    model.save('saved_model.h5')
-    # print('Model saved')
+    # import keras
+    # from keras.models import Sequential
+    # from keras.layers import Dense, Dropout
+    # from keras.metrics import Recall
+    # model = Sequential()
+    # model.add(Dense(units = 14, activation = 'relu', input_dim = 30))
+    # model.add(Dropout(0.2995426239200045))
+    # model.add(Dense(units = 18, activation = 'relu'))
+    # model.add(Dropout(0.20974398051884063))
+    # model.add(Dense(units = 1, activation = 'sigmoid'))
+    #
+    # rmsprop = keras.optimizers.RMSprop(lr=10**-2)
+    #
+    # model.compile(optimizer = rmsprop, loss = 'binary_crossentropy', metrics = ['accuracy'])
+    #
+    # result = model.fit(x= X_train,y = y_train, batch_size = 24, epochs = 200, validation_split = 0.2)
+    # model.save('saved_model.h5')
+    # # print('Model saved')
     
-    # model = load_model('saved_model.h5')
+    model = load_model('saved_model.h5')
 
     return model
+
+
+def evaluate_model():
+    saved_model = build_ntwrk()
+    score, acc = saved_model.evaluate(X_test, y_test)
+
+    print(score)
+    print(acc)
+    # C = pd.DataFrame([['RF',0.8605442176870748, 0.15053763440860216,0.2545454545454546],
+    #                   ['XGB',0.8673469387755102, 0.2903225806451613, 0.4090909090909091],
+    #                   ['NN',0.8348531126976013, 0.9271255135536194,0.9008097052574158]], columns = ['Model','Accuracy','Recall','Precision'])
+    # C.plot.bar()
+
+    y_pred = saved_model.predict_classes(X_test)
+
+    from sklearn.metrics import confusion_matrix
+
+    tn, fp, fn, tp = confusion_matrix(y_test, y_pred).ravel()
+
+    print(confusion_matrix(y_test, y_pred))
+
+    precision = tp / (tp + fp)
+    recall = tp / (tp + fn)
+    sensitivity = tp / (tp + fn)
+    specitivity = tn / (tn + fp)
+
+    print('Precision :', precision)
+    print('Recall :', recall)
+    print('Sensitivity :', sensitivity)
+    print('Specitivity :', specitivity)
+
+    return acc, precision, recall, sensitivity, specitivity
 
 
 X_train, y_train, X_test, y_test = data()
@@ -158,50 +194,19 @@ X_train, y_train, X_test, y_test = data()
 
 saved_model = build_ntwrk()
 
-score, acc = saved_model.evaluate(X_test, y_test)
-
-# print(score)
-# print(acc)
-# print(rec)
-
-C = pd.DataFrame([['RF',0.8605442176870748, 0.15053763440860216,0.2545454545454546],
-                  ['XGB',0.8673469387755102, 0.2903225806451613, 0.4090909090909091],
-                  ['NN',0.8348531126976013, 0.9271255135536194,0.9008097052574158]], columns = ['Model','Accuracy','Recall','Precision'])
-
-# C.plot.bar()
-# y_pred = saved_model.predict_classes(X_test)
-
-# from sklearn.metrics import confusion_matrix
-
-# tn, fp, fn, tp = confusion_matrix(y_test, y_pred).ravel()
-
-# print(confusion_matrix(y_test, y_pred))
-
-# sens = tp / (tp + fn)
-# spec = tn / (tn + fp)
-# print(sens)
-# print(y_pred)
+#K fold cross validation
 model = KerasClassifier(build_fn=build_ntwrk, batch_size=24, epochs=200)
 
 # perm = PermutationImportance(model, random_state=1).fit(X_train, y_train)
 # eli5.show_weights(perm, feature_names=X_train.columns.tolist())
-
+#
 scoring = {'acc': make_scorer(accuracy_score),
            'rec': make_scorer(recall_score),
            'f1': make_scorer(f1_score)}
 
 # cross_val = cross_validate(estimator=model, X=X_train, y=y_train, scoring=scoring, cv=10)
-
-from sklearn.feature_selection import RFE
-
-# selector = RFE(estimator=model, n_features_to_select=15, step=1)
-# selector = selector.fit(X_train, y_train)
-
-# print(selector.support_)
-# print(selector.ranking_)
-
 '''
-print(cross_val.keys())
+# print(cross_val.keys())
 print('Accuracy Mean : ', cross_val['test_acc'].mean())
 print('Accuracy Std : ', cross_val['test_acc'].std())
 
@@ -211,3 +216,12 @@ print('Recall Std : ', cross_val['test_rec'].std())
 print('f1_score Mean : ', cross_val['test_f1'].mean())
 print('f1_score Std : ', cross_val['test_f1'].std())
 '''
+
+#For feature Selection try
+from sklearn.feature_selection import RFE
+
+# selector = RFE(estimator=model, n_features_to_select=15, step=1)
+# selector = selector.fit(X_train, y_train)
+
+# print(selector.support_)
+# print(selector.ranking_)

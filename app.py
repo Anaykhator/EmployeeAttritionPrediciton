@@ -5,6 +5,7 @@ from flask_session import Session
 from tempfile import mkdtemp
 from helpers import login_required, sorry, updateMessage
 from machine import run
+from NN import evaluate_model
 
 app = Flask(__name__)
 
@@ -131,7 +132,9 @@ def attrition():
         i = i+1
         newd.append(t)
     cur.close()
-    return render_template("attrition.html", data=newd)
+    eval = []
+    eval = list(evaluate_model())
+    return render_template("attrition.html", data=newd, evaluations=eval, display_eval=True)
 
 
 def attr(id):
@@ -152,7 +155,9 @@ def attr(id):
             break
         i = i + 1
     cur.close()
-    return render_template("attrition.html", data=newd)
+    eval = []
+    eval = list(evaluate_model())
+    return render_template("attrition.html", data=newd, evaluations=eval, display_eval=False)
 
 @app.route("/graph")
 @login_required
